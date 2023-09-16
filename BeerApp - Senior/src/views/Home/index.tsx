@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchData } from './utils';
-import { Beer } from '../../types';
+import { ApiParams, Beer } from '../../types';
 import { Link as RouterLink } from 'react-router-dom';
 import { Button, Checkbox, Paper, TextField, Link } from '@mui/material';
 import styles from './Home.module.css';
@@ -8,9 +8,20 @@ import styles from './Home.module.css';
 const Home = () => {
   const [beerList, setBeerList] = useState<Array<Beer>>([]);
   const [savedList, setSavedList] = useState<Array<Beer>>([]);
+  const [filterText, setFilterText] = useState<string>('');
+
+  const getParams = ():ApiParams => {
+    return {by_name:filterText};
+  };
 
   // eslint-disable-next-line
-  useEffect(fetchData.bind(this, setBeerList), []);
+  useEffect(fetchData.bind(this, setBeerList, getParams()), []);
+
+  const handleFilterTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const filterText = event.target.value;
+    setFilterText(filterText);
+    fetchData(setBeerList,  getParams())
+  };
 
   return (
     <article>
@@ -19,7 +30,7 @@ const Home = () => {
           <Paper>
             <div className={styles.listContainer}>
               <div className={styles.listHeader}>
-                <TextField label='Filter...' variant='outlined' />
+                <TextField label='Filter...' variant='outlined' value={filterText} onChange={handleFilterTextChange}/>
                 <Button variant='contained'>Reload list</Button>
               </div>
               <ul className={styles.list}>
