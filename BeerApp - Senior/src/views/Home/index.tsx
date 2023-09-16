@@ -9,9 +9,15 @@ const Home = () => {
   const [beerList, setBeerList] = useState<Array<Beer>>([]);
   const [savedList, setSavedList] = useState<Array<Beer>>([]);
   const [filterText, setFilterText] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
 
   const getParams = ():ApiParams => {
-    return {by_name:filterText};
+    return {
+      by_name:filterText,
+      page: currentPage,
+      per_page: itemsPerPage
+    };
   };
 
   // eslint-disable-next-line
@@ -20,7 +26,23 @@ const Home = () => {
   const handleFilterTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const filterText = event.target.value;
     setFilterText(filterText);
+    //Reset to page 1. Keeping the page number might be a problem if the filtered list has less pages.
+    setCurrentPage(1);
     fetchData(setBeerList,  getParams())
+  };
+  
+  //TODO Disable paging while request is in progress
+  const handleNextPage = () => {
+    setCurrentPage(currentPage + 1);
+    fetchData(setBeerList,  getParams())
+  };
+
+  //TODO Disable paging while request is in progress
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      fetchData(setBeerList,  getParams())
+    }
   };
 
   return (
@@ -43,6 +65,17 @@ const Home = () => {
                   </li>
                 ))}
               </ul>
+
+              <div className={styles.pagination}>
+                <Button variant='contained' onClick={handlePrevPage} disabled={currentPage === 1}>
+                  Previous Page
+                </Button>
+                Page number: {currentPage}
+                {/*TODO find out if it's possible to retrieve the total number of pages*/}
+                <Button variant='contained' onClick={handleNextPage} disabled={beerList.length < itemsPerPage}>
+                  Next Page
+                </Button>
+              </div>
             </div>
           </Paper>
 
