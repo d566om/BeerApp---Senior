@@ -12,6 +12,7 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [sortOrder, setSortOrder] = useState<string>('name:asc');
   const itemsPerPage = 10;
+  const localStorageKey = 'savedBeers';
 
   const getParams = ():ApiParams => {
     return {
@@ -24,6 +25,14 @@ const Home = () => {
 
   // eslint-disable-next-line
   useEffect(fetchData.bind(this, setBeerList, getParams()), []);
+  useEffect(() => loadSavedBeersFromLocalStorage);
+
+  const loadSavedBeersFromLocalStorage = () => {
+    const savedList = localStorage.getItem(localStorageKey);
+    if (savedList) {
+      setSavedList(JSON.parse(savedList));
+    }
+  };
 
   const handleFilterTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const filterText = event.target.value;
@@ -54,13 +63,15 @@ const Home = () => {
   };
 
   const handleBeerCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Create copy of saved list, and modify this
+    var newSavedList = structuredClone(savedList);
+    
     // If a beer is favourited/unfavourited, delete it from the existing favourite list
     // With this if we favourite a beer with updated properties, the updated props will be saved
     const deleteIndex = savedList.findIndex(savedBeer => savedBeer.id === event.target.id);
     if (deleteIndex !== -1) {
-      var newSavedList = structuredClone(savedList);
       newSavedList.splice(deleteIndex, 1)
-      setSavedList(newSavedList);
+      
     }
 
     // Save the new favourite
@@ -68,15 +79,22 @@ const Home = () => {
       const indexOfBeer = beerList.findIndex(beer => beer.id === event.target.id);
       if (indexOfBeer !== -1) {
         const copyOfBeer = structuredClone(beerList[indexOfBeer]);
-        var newSavedList = structuredClone(savedList);
         newSavedList.push(copyOfBeer);
-        setSavedList(newSavedList);
       }
     }
+
+    // Save the updated list
+    setSavedList(newSavedList);
+    localStorage.setItem(localStorageKey, JSON.stringify(newSavedList));
   }
 
   const isBeerFavourited = (beer: Beer):boolean => {
     return savedList.some(savedBeer => savedBeer.id === beer.id);
+  }
+
+  const clearFavourites = () => {
+    setSavedList([]);
+    localStorage.setItem(localStorageKey, JSON.stringify([]));
   }
 
   return (
@@ -123,7 +141,7 @@ const Home = () => {
             <div className={styles.listContainer}>
               <div className={styles.listHeader}>
                 <h3>Saved items</h3>
-                <Button variant='contained' size='small'>
+                <Button variant='contained' size='small' onClick={clearFavourites}>
                   Remove all items
                 </Button>
               </div>
