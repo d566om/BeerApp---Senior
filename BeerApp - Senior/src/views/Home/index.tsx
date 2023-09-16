@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchData } from './utils';
+import { fetchData, loadSavedBeersFromLocalStorage, saveBeersToLocalstorage } from './utils';
 import { ApiParams, Beer , SORT} from '../../types';
 import { Link as RouterLink } from 'react-router-dom';
 import { Button, Checkbox, Paper, TextField, Link } from '@mui/material';
@@ -12,8 +12,7 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [sortOrder, setSortOrder] = useState<string>('name:asc');
   const itemsPerPage = 10;
-  const localStorageKey = 'savedBeers';
-
+  
   const getParams = ():ApiParams => {
     return {
       by_name:filterText,
@@ -25,14 +24,7 @@ const Home = () => {
 
   // eslint-disable-next-line
   useEffect(fetchData.bind(this, setBeerList, getParams()), []);
-  useEffect(() => loadSavedBeersFromLocalStorage);
-
-  const loadSavedBeersFromLocalStorage = () => {
-    const savedList = localStorage.getItem(localStorageKey);
-    if (savedList) {
-      setSavedList(JSON.parse(savedList));
-    }
-  };
+  useEffect(() => setSavedList(loadSavedBeersFromLocalStorage()));
 
   const handleFilterTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const filterText = event.target.value;
@@ -83,9 +75,12 @@ const Home = () => {
       }
     }
 
-    // Save the updated list
-    setSavedList(newSavedList);
-    localStorage.setItem(localStorageKey, JSON.stringify(newSavedList));
+    updateSavedBeers(newSavedList)
+  }
+
+  const updateSavedBeers = (savedBeers:Beer[]):void => {
+    setSavedList(savedBeers);
+    saveBeersToLocalstorage(savedBeers);
   }
 
   const isBeerFavourited = (beer: Beer):boolean => {
@@ -93,8 +88,7 @@ const Home = () => {
   }
 
   const clearFavourites = () => {
-    setSavedList([]);
-    localStorage.setItem(localStorageKey, JSON.stringify([]));
+    updateSavedBeers([]);
   }
 
   return (
