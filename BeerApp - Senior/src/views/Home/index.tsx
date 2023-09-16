@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchData } from './utils';
-import { ApiParams, Beer } from '../../types';
+import { ApiParams, Beer , SORT} from '../../types';
 import { Link as RouterLink } from 'react-router-dom';
 import { Button, Checkbox, Paper, TextField, Link } from '@mui/material';
 import styles from './Home.module.css';
@@ -10,13 +10,15 @@ const Home = () => {
   const [savedList, setSavedList] = useState<Array<Beer>>([]);
   const [filterText, setFilterText] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [sortOrder, setSortOrder] = useState<string>('name:asc');
   const itemsPerPage = 10;
 
   const getParams = ():ApiParams => {
     return {
       by_name:filterText,
       page: currentPage,
-      per_page: itemsPerPage
+      per_page: itemsPerPage,
+      sort:sortOrder as SORT
     };
   };
 
@@ -30,6 +32,12 @@ const Home = () => {
     setCurrentPage(1);
     fetchData(setBeerList,  getParams())
   };
+
+  const handleSortOrderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const sortOrder = event.target.value;
+    setSortOrder(sortOrder);
+    fetchData(setBeerList,  getParams());
+  }
   
   //TODO Disable paging while request is in progress
   const handleNextPage = () => {
@@ -65,6 +73,11 @@ const Home = () => {
                   </li>
                 ))}
               </ul>
+
+              <select value={sortOrder} onChange={handleSortOrderChange}>
+                <option value='name:asc'>Ascending</option>
+                <option value='name:desc'>Descending</option>
+              </select>
 
               <div className={styles.pagination}>
                 <Button variant='contained' onClick={handlePrevPage} disabled={currentPage === 1}>
