@@ -24,33 +24,32 @@ const Home = () => {
 
   // eslint-disable-next-line
   useEffect(fetchData.bind(this, setBeerList, getParams()), []);
-  useEffect(() => setSavedList(loadSavedBeersFromLocalStorage()));
+  useEffect(() => setSavedList(loadSavedBeersFromLocalStorage()), []);
+  useEffect(() => {
+    fetchData(setBeerList,  getParams());
+  }, [filterText, currentPage, sortOrder]);
 
   const handleFilterTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const filterText = event.target.value;
     setFilterText(filterText);
     //Reset to page 1. Keeping the page number might be a problem if the filtered list has less pages.
     setCurrentPage(1);
-    fetchData(setBeerList,  getParams())
   };
 
   const handleSortOrderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const sortOrder = event.target.value;
     setSortOrder(sortOrder);
-    fetchData(setBeerList,  getParams());
   }
   
   //TODO Disable paging while request is in progress
   const handleNextPageClick = () => {
     setCurrentPage(currentPage + 1);
-    fetchData(setBeerList,  getParams())
   };
 
   //TODO Disable paging while request is in progress
   const handlePrevPageClick = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
-      fetchData(setBeerList,  getParams())
     }
   };
 
@@ -99,7 +98,6 @@ const Home = () => {
             <div className={styles.listContainer}>
               <div className={styles.listHeader}>
                 <TextField label='Filter...' variant='outlined' value={filterText} onChange={handleFilterTextChange}/>
-                <Button variant='contained'>Reload list</Button>
               </div>
               <ul className={styles.list}>
                 {beerList.map((beer, index) => (
