@@ -40,18 +40,44 @@ const Home = () => {
   }
   
   //TODO Disable paging while request is in progress
-  const handleNextPage = () => {
+  const handleNextPageClick = () => {
     setCurrentPage(currentPage + 1);
     fetchData(setBeerList,  getParams())
   };
 
   //TODO Disable paging while request is in progress
-  const handlePrevPage = () => {
+  const handlePrevPageClick = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
       fetchData(setBeerList,  getParams())
     }
   };
+
+  const handleBeerCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // If a beer is favourited/unfavourited, delete it from the existing favourite list
+    // With this if we favourite a beer with updated properties, the updated props will be saved
+    const deleteIndex = savedList.findIndex(savedBeer => savedBeer.id === event.target.id);
+    if (deleteIndex !== -1) {
+      var newSavedList = structuredClone(savedList);
+      newSavedList.splice(deleteIndex, 1)
+      setSavedList(newSavedList);
+    }
+
+    // Save the new favourite
+    if (event.target.checked) {
+      const indexOfBeer = beerList.findIndex(beer => beer.id === event.target.id);
+      if (indexOfBeer !== -1) {
+        const copyOfBeer = structuredClone(beerList[indexOfBeer]);
+        var newSavedList = structuredClone(savedList);
+        newSavedList.push(copyOfBeer);
+        setSavedList(newSavedList);
+      }
+    }
+  }
+
+  const isBeerFavourited = (beer: Beer):boolean => {
+    return savedList.some(savedBeer => savedBeer.id === beer.id);
+  }
 
   return (
     <article>
@@ -66,10 +92,11 @@ const Home = () => {
               <ul className={styles.list}>
                 {beerList.map((beer, index) => (
                   <li key={index.toString()}>
-                    <Checkbox />
+                    <Checkbox id={beer.id} checked={isBeerFavourited(beer)} onChange={handleBeerCheckboxClick}/>
                     <Link component={RouterLink} to={`/beer/${beer.id}`}>
                       {beer.name}
                     </Link>
+                    &nbsp;({beer.city} {beer.street})
                   </li>
                 ))}
               </ul>
@@ -80,12 +107,12 @@ const Home = () => {
               </select>
 
               <div className={styles.pagination}>
-                <Button variant='contained' onClick={handlePrevPage} disabled={currentPage === 1}>
+                <Button variant='contained' onClick={handlePrevPageClick} disabled={currentPage === 1}>
                   Previous Page
                 </Button>
                 Page number: {currentPage}
                 {/*TODO find out if it's possible to retrieve the total number of pages*/}
-                <Button variant='contained' onClick={handleNextPage} disabled={beerList.length < itemsPerPage}>
+                <Button variant='contained' onClick={handleNextPageClick} disabled={beerList.length < itemsPerPage}>
                   Next Page
                 </Button>
               </div>
@@ -103,10 +130,11 @@ const Home = () => {
               <ul className={styles.list}>
                 {savedList.map((beer, index) => (
                   <li key={index.toString()}>
-                    <Checkbox />
+                    <Checkbox id={beer.id} checked={isBeerFavourited(beer)} onChange={handleBeerCheckboxClick}/>
                     <Link component={RouterLink} to={`/beer/${beer.id}`}>
                       {beer.name}
                     </Link>
+                    &nbsp;({beer.city} {beer.street})
                   </li>
                 ))}
                 {!savedList.length && <p>No saved items</p>}
