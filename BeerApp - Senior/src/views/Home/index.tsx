@@ -41,17 +41,10 @@ const Home = () => {
     const sortOrder = event.target.value;
     setSortOrder(sortOrder);
   }
-  
-  //TODO Disable paging while request is in progress
-  const handleNextPageClick = () => {
-    setCurrentPage(currentPage + 1);
-  };
 
-  //TODO Disable paging while request is in progress
-  const handlePrevPageClick = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
+     // Material table uses 0 indexes for pagination
+    setCurrentPage(page+1);
   };
 
   const handleBeerCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,35 +122,34 @@ const Home = () => {
                           <Checkbox id={beer.id} checked={isBeerFavourited(beer)} onChange={handleBeerCheckboxClick}/>
                         </TableCell>
                         <TableCell component="th" scope="row">
-                          <Link component={RouterLink} to={`/beer/${beer.id}`}>
-                            {beer.name}
-                          </Link>
+                          <Link component={RouterLink} to={`/beer/${beer.id}`}>{beer.name}</Link>
                         </TableCell>
-                        <TableCell>
-                          ({beer.city} {beer.street})
-                        </TableCell>
-                        <TableCell>
-                          {beer.brewery_type}
-                        </TableCell>
-                        <TableCell>
-                          {beer.phone}
-                        </TableCell>
+                        <TableCell>({beer.city} {beer.street})</TableCell>
+                        <TableCell>{beer.brewery_type}</TableCell>
+                        <TableCell>{beer.phone}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
+                  <TableFooter>
+                    <TableRow>
+                      <TablePagination
+                        rowsPerPageOptions={[]}
+                        count={-1}
+                        rowsPerPage={itemsPerPage}
+                        page={currentPage-1}
+                        SelectProps={{
+                          inputProps: {
+                            'aria-label': 'rows per page',
+                          },
+                          native: true,
+                        }}
+                        onPageChange={handlePageChange}
+                      />
+                    </TableRow>
+                  </TableFooter>
                 </Table>
               </TableContainer>
               </ul>
-
-              <div className={styles.pagination}>
-                <Button variant='outlined' onClick={handlePrevPageClick} disabled={currentPage === 1}>
-                  {'<'}
-                </Button>
-                {/*TODO find out if it's possible to retrieve the total number of pages*/}
-                <Button variant='outlined' onClick={handleNextPageClick} disabled={beerList.length < itemsPerPage}>
-                {'>'}
-                </Button>
-              </div>
             </div>
           </Paper>
 
