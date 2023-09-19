@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { fetchData, loadSavedBeersFromLocalStorage, saveBeersToLocalstorage } from './utils';
 import { ApiParams, Beer , SORT} from '../../types';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, Checkbox, Paper, TextField, Link, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import { Button, Checkbox, Paper, TextField, Link, Select, MenuItem, SelectChangeEvent, Table, TableBody, TableCell, TableContainer, TableFooter, TablePagination, TableRow, TableHead } from '@mui/material';
 import styles from './Home.module.css';
+import TablePaginationActions from '@mui/material/TablePagination/TablePaginationActions';
 
 const Home = () => {
   const [beerList, setBeerList] = useState<Array<Beer>>([]);
@@ -110,15 +111,42 @@ const Home = () => {
                 </Select>
               </div>
               <ul className={styles.list}>
-                {beerList.map((beer, index) => (
-                  <li key={index.toString()}>
-                    <Checkbox id={beer.id} checked={isBeerFavourited(beer)} onChange={handleBeerCheckboxClick}/>
-                    <Link component={RouterLink} to={`/beer/${beer.id}`}>
-                      {beer.name}
-                    </Link>
-                    &nbsp;({beer.city} {beer.street})
-                  </li>
-                ))}
+                <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 400 }} aria-label="custom pagination table" size={'small'}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Favourite</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Address</TableCell>
+                      <TableCell>Brewery type</TableCell>
+                      <TableCell>Phone</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {beerList.map((beer, index) => (
+                      <TableRow key={beer.id}>
+                        <TableCell scope="row">
+                          <Checkbox id={beer.id} checked={isBeerFavourited(beer)} onChange={handleBeerCheckboxClick}/>
+                        </TableCell>
+                        <TableCell component="th" scope="row">
+                          <Link component={RouterLink} to={`/beer/${beer.id}`}>
+                            {beer.name}
+                          </Link>
+                        </TableCell>
+                        <TableCell>
+                          ({beer.city} {beer.street})
+                        </TableCell>
+                        <TableCell>
+                          {beer.brewery_type}
+                        </TableCell>
+                        <TableCell>
+                          {beer.phone}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
               </ul>
 
               <div className={styles.pagination}>
