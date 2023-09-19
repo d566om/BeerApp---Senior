@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchData, loadSavedBeersFromLocalStorage, saveBeersToLocalstorage } from './utils';
 import { ApiParams, Beer , SORT} from '../../types';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, Checkbox, Paper, TextField, Link } from '@mui/material';
+import { Button, Checkbox, Paper, TextField, Link, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import styles from './Home.module.css';
 
 const Home = () => {
@@ -36,7 +36,7 @@ const Home = () => {
     setCurrentPage(1);
   };
 
-  const handleSortOrderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSortOrderChange = (event: SelectChangeEvent) => {
     const sortOrder = event.target.value;
     setSortOrder(sortOrder);
   }
@@ -98,6 +98,16 @@ const Home = () => {
             <div className={styles.listContainer}>
               <div className={styles.listHeader}>
                 <TextField label='Filter...' variant='outlined' value={filterText} onChange={handleFilterTextChange}/>
+                <Select
+                  labelId="sort-order-select"
+                  id="sort-order-select"
+                  value={sortOrder}
+                  label="Sort order"
+                  onChange={handleSortOrderChange}
+                >
+                  <MenuItem value={'name:asc'}>Ascending</MenuItem>
+                  <MenuItem value={'name:desc'}>Descending</MenuItem>
+                </Select>
               </div>
               <ul className={styles.list}>
                 {beerList.map((beer, index) => (
@@ -111,19 +121,13 @@ const Home = () => {
                 ))}
               </ul>
 
-              <select value={sortOrder} onChange={handleSortOrderChange}>
-                <option value='name:asc'>Ascending</option>
-                <option value='name:desc'>Descending</option>
-              </select>
-
               <div className={styles.pagination}>
-                <Button variant='contained' onClick={handlePrevPageClick} disabled={currentPage === 1}>
-                  Previous Page
+                <Button variant='outlined' onClick={handlePrevPageClick} disabled={currentPage === 1}>
+                  {'<'}
                 </Button>
-                Page number: {currentPage}
                 {/*TODO find out if it's possible to retrieve the total number of pages*/}
-                <Button variant='contained' onClick={handleNextPageClick} disabled={beerList.length < itemsPerPage}>
-                  Next Page
+                <Button variant='outlined' onClick={handleNextPageClick} disabled={beerList.length < itemsPerPage}>
+                {'>'}
                 </Button>
               </div>
             </div>

@@ -17,9 +17,24 @@ const Beer = () => {
           <h1>{beer?.name}</h1>
         </header>
         <main>
-          <span>
-            <b>Type: </b> {beer?.brewery_type}
-          </span>
+          <table>
+            <tr>
+              <td>Type: </td> 
+              <td>{beer?.brewery_type}</td>
+            </tr>
+            <tr>
+              <td>City: </td>
+              <td> {beer?.city}</td>
+            </tr>
+            <tr>
+              <td>Website: </td>
+              <td> {beer?.website_url}</td>
+            </tr>
+            <tr>
+              <td>Country: </td>
+              <td> {beer?.country}</td>
+            </tr>
+          </table>
         </main>
       </section>
     </article>
