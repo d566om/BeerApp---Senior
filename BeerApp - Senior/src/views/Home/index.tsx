@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchData, loadSavedBeersFromLocalStorage, saveBeersToLocalstorage } from './utils';
 import { ApiParams, Beer , SORT} from '../../types';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, Checkbox, Paper, TextField, Link, Select, MenuItem, SelectChangeEvent, Table, TableBody, TableCell, TableContainer, TableFooter, TablePagination, TableRow, TableHead } from '@mui/material';
+import { Button, Checkbox, Paper, TextField, Link, Select, MenuItem, SelectChangeEvent, Table, TableBody, TableCell, TableContainer, TableFooter, TablePagination, TableRow, TableHead, Box, TableSortLabel } from '@mui/material';
 import styles from './Home.module.css';
 import TablePaginationActions from '@mui/material/TablePagination/TablePaginationActions';
 
@@ -37,9 +37,9 @@ const Home = () => {
     setCurrentPage(1);
   };
 
-  const handleSortOrderChange = (event: SelectChangeEvent) => {
-    const sortOrder = event.target.value;
-    setSortOrder(sortOrder);
+  const handleSortOrderChange = (event: React.MouseEvent<unknown>) => {
+    const newSortOrder = sortOrder === 'name:asc' ? 'name:desc' : 'name:asc';
+    setSortOrder(newSortOrder);
   }
 
   const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
@@ -83,6 +83,7 @@ const Home = () => {
   const clearFavourites = () => {
     updateSavedBeers([]);
   }
+  
 
   return (
     <article>
@@ -92,16 +93,6 @@ const Home = () => {
             <div className={styles.listContainer}>
               <div className={styles.listHeader}>
                 <TextField label='Filter...' variant='outlined' value={filterText} onChange={handleFilterTextChange}/>
-                <Select
-                  labelId="sort-order-select"
-                  id="sort-order-select"
-                  value={sortOrder}
-                  label="Sort order"
-                  onChange={handleSortOrderChange}
-                >
-                  <MenuItem value={'name:asc'}>Ascending</MenuItem>
-                  <MenuItem value={'name:desc'}>Descending</MenuItem>
-                </Select>
               </div>
               <ul className={styles.list}>
                 <TableContainer component={Paper}>
@@ -109,7 +100,13 @@ const Home = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell>Favourite</TableCell>
-                      <TableCell>Name</TableCell>
+                      <TableCell
+                        sortDirection={sortOrder === 'name:asc' ? 'asc' : 'desc'}
+                      >
+                        <TableSortLabel active={true} direction={sortOrder === 'name:asc' ? 'asc' : 'desc'} onClick={handleSortOrderChange}>
+                          Name
+                        </TableSortLabel>
+                      </TableCell>
                       <TableCell>Address</TableCell>
                       <TableCell>Brewery type</TableCell>
                       <TableCell>Phone</TableCell>
