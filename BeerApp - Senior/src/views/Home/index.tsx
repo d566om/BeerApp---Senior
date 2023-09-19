@@ -39,6 +39,8 @@ const Home = () => {
 
   const handleSortOrderChange = (event: React.MouseEvent<unknown>) => {
     const newSortOrder = sortOrder === 'name:asc' ? 'name:desc' : 'name:asc';
+    // It's practical to jump to the first page
+    setCurrentPage(1);
     setSortOrder(newSortOrder);
   }
 
