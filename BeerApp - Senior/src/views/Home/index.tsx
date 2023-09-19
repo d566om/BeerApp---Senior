@@ -94,7 +94,6 @@ const Home = () => {
               <div className={styles.listHeader}>
                 <TextField label='Filter...' variant='outlined' value={filterText} onChange={handleFilterTextChange}/>
               </div>
-              <ul className={styles.list}>
                 <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 400 }} aria-label="custom pagination table" size={'small'}>
                   <TableHead>
@@ -146,7 +145,6 @@ const Home = () => {
                   </TableFooter>
                 </Table>
               </TableContainer>
-              </ul>
             </div>
           </Paper>
 
@@ -158,18 +156,35 @@ const Home = () => {
                   Remove all items
                 </Button>
               </div>
-              <ul className={styles.list}>
-                {savedList.map((beer, index) => (
-                  <li key={index.toString()}>
-                    <Checkbox id={beer.id} checked={isBeerFavourited(beer)} onChange={handleBeerCheckboxClick}/>
-                    <Link component={RouterLink} to={`/beer/${beer.id}`}>
-                      {beer.name}
-                    </Link>
-                    &nbsp;({beer.city} {beer.street})
-                  </li>
-                ))}
-                {!savedList.length && <p>No saved items</p>}
-              </ul>
+              <TableContainer component={Paper} style={{maxHeight: 200}}>
+                <Table sx={{ minWidth: 400 }} aria-label="custom table" size={'small'} stickyHeader>
+                <TableHead>
+                    <TableRow>
+                      <TableCell>Favourite</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Address</TableCell>
+                      <TableCell>Brewery type</TableCell>
+                      <TableCell>Phone</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {savedList.map((beer, index) => (
+                      <TableRow key={beer.id}>
+                        <TableCell scope="row">
+                          <Checkbox id={beer.id} checked={isBeerFavourited(beer)} onChange={handleBeerCheckboxClick}/>
+                        </TableCell>
+                        <TableCell component="th" scope="row">
+                          <Link component={RouterLink} to={`/beer/${beer.id}`}>{beer.name}</Link>
+                        </TableCell>
+                        <TableCell>({beer.city} {beer.street})</TableCell>
+                        <TableCell>{beer.brewery_type}</TableCell>
+                        <TableCell>{beer.phone}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              {!savedList.length && <p>No saved items</p>}
             </div>
           </Paper>
         </main>
